@@ -1,5 +1,11 @@
 import { db } from "../libs/db.js";
 
+export const findEmployeeEmail = async (email) => {
+    const q = "SELECT * FROM employees WHERE email = ?";
+    const [row] = await db.execute(q, [email]);
+    return row;
+}
+
 export const employeeAdd = async (img, name, email, department, salary) => {
   const q =
     "INSERT  INTO employees (img,name,email,department,salary) VALUES (?, ?, ?, ?, ?)";

@@ -3,12 +3,20 @@ import {
   employeeAdd,
   employeeDelete,
   employeeUpdate,
+  findEmployeeEmail,
   singleEmployee,
 } from "../models/employeeModel.js";
 
 export const createEmployee = async (req, res) => {
   try {
     const { img, name, email, department, salary } = req.body;
+
+    const employee = await findEmployeeEmail(email)
+
+    if (employee.length) {
+      return res.status(409).json("Employee already exists");
+    }
+
     await employeeAdd(img, name, email, department, salary);
     res.status(200).json("Employee Created Successfully");
   } catch (error) {

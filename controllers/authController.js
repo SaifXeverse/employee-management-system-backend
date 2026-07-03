@@ -2,9 +2,15 @@ import bcrypt from "bcrypt";
 import { findUserEmail, createUser, getAllUsers } from "../models/authModel.js";
 import jwt from "jsonwebtoken";
 
+const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    if (!gmailRegex.test(email)) {
+       return res.status(400).json("Only @gmail.com are allowed.");
+    }
 
     const user = await findUserEmail(email);
 

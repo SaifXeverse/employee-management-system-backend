@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { findUserEmail, createUser, getAllUsers } from "../models/authModel.js";
+import { findUserEmail, createUser, getDBUser, updateDBUser } from "../models/authModel.js";
 import jwt from "jsonwebtoken";
 
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!gmailRegex.test(email)) {
-       return res.status(400).json("Only @gmail.com are allowed.");
+      return res.status(400).json("Only @gmail.com are allowed.");
     }
 
     const user = await findUserEmail(email);
@@ -34,7 +34,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
     const user = await findUserEmail(email);
 
     if (!user.length) {
@@ -74,13 +74,36 @@ export const logout = (req, res) => {
   return res.status(200).json("User is logout");
 };
 
-export const getUsers = async (req, res) => {
+export const checkUser = (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+};
+
+export const getUser = async (req, res) => {
   try {
-    const users = await getAllUsers();
-    res.status(200).json(users);
+    const user = await getDBUser(req.user.id);
+    const { password: pass, ...others } = user[0];
+
+    res.status(200).json(others);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json(error + "error");
   }
 };
+
+export const updateUser = async (req, res) => {
+  try {
+     const id = req.user.id;
+     const {img, name, email} = req.body;
+
+     if (!gmailRegex.test(email)) {
+      return res.status(400).json("Only @gmail.com are allowed.");
+    }
+
+     const result = await updateDBUser(id, req.body)
+     res.status(200).json(result)
+  } catch (error) {
+    res.status(500).json(error + "error")
+  }
+}

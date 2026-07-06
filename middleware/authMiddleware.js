@@ -1,16 +1,15 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.AccessToken;
   if (!token) {
-    return res.status(401).json("Access Denied");
+    return res.status(401).json("No Token");
   }
-
   try {
-    const decode = jwt.verify(token, "tokenSecret");
-    req.user = decode;
+    const decoded = jwt.verify(token, "tokenSecret");
+    req.user = decoded;
     next();
-  } catch (error) {
+  } catch (err) {
     return res.status(401).json("Invalid Token");
   }
 };

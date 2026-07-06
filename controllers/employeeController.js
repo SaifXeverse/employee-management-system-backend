@@ -8,10 +8,13 @@ import {
 } from "../models/employeeModel.js";
 
 export const createEmployee = async (req, res) => {
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
   try {
     const { img, name, email, department, salary } = req.body;
-
-    const employee = await findEmployeeEmail(email)
+    if (!gmailRegex.test(email)) {
+      return res.status(400).json("Only @gmail.com are allowed.");
+    }
+    const employee = await findEmployeeEmail(email);
 
     if (employee.length) {
       return res.status(409).json("Employee already exists");

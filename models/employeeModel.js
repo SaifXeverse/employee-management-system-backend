@@ -1,10 +1,10 @@
 import { db } from "../libs/db.js";
 
 export const findEmployeeEmail = async (email) => {
-    const q = "SELECT * FROM employees WHERE email = ?";
-    const [row] = await db.execute(q, [email]);
-    return row;
-}
+  const q = "SELECT * FROM employees WHERE email = ?";
+  const [row] = await db.execute(q, [email]);
+  return row;
+};
 
 export const employeeAdd = async (img, name, email, department, salary) => {
   const q =
@@ -33,10 +33,15 @@ export const employeeDelete = async (id) => {
 
 export const employeeUpdate = async (id, employeeData) => {
   const { name, email, department, salary, img } = employeeData;
-
   const q =
     "UPDATE employees SET img = ?, name = ?, email = ?, department = ?,  salary = ? WHERE id = ?";
-  const [result] = await db.execute(q, [img, name, email, department, salary, id]);
-
+  const [result] = await db.execute(q, [
+    img,
+    name,
+    email,
+    department,
+    salary,
+    id,
+  ]);
   return result;
 };

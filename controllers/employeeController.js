@@ -7,13 +7,15 @@ import {
   employeeUpdateStatus,
   findEmployeeEmail,
   singleEmployee,
+  updateDBEmployee,
 } from "../models/employeeModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
 export const createEmployee = async (req, res) => {
   try {
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
     const { img, name, email, password, department, status, salary } = req.body;
     if (!gmailRegex.test(email)) {
@@ -92,10 +94,9 @@ export const getEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = await singleEmployee(id);
-
     res.status(200).json({
       message: "Employee Found",
-      employee,
+      employee: employee[0],
     });
   } catch (error) {
     res.status(500).json(error + "error");
@@ -106,7 +107,6 @@ export const getEmployeeProfile = async (req, res) => {
   try {
     const employee = await singleEmployee(req.user.id);
     const { password: pass, ...others } = employee[0];
-
     res.status(200).json(others);
   } catch (error) {
     res.status(500).json(error + "error");
@@ -170,6 +170,21 @@ export const updateEmployee = async (req, res) => {
   } catch (error) {
     res.status(500).json(error + "error");
   }
+};
+
+export const updateEmployeeProfile = async (req, res) => {
+  try {
+       const id = req.user.id;
+  
+       if (!gmailRegex.test(req.body.email)) {
+        return res.status(400).json("Only @gmail.com are allowed.");
+      }
+  
+       const result = await updateDBEmployee(id, req.body)
+       res.status(200).json(result)
+    } catch (error) {
+      res.status(500).json(error + "error")
+    }
 };
 
 export const updateEmployeeStatus = async (req, res) => {

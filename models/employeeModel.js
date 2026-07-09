@@ -29,7 +29,7 @@ export const singleEmployee = async (id) => {
 };
 
 export const allEmployees = async () => {
-  const q = "SELECT * FROM employees";
+  const q = "SELECT * FROM employees WHERE status = 'active'";
   const [rows] = await db.execute(q);
   return rows;
 };
@@ -69,5 +69,12 @@ export const employeeUpdateStatus = async (id, status) => {
     status,
     id,
   ]);
+  return result;
+};
+
+export const updateDBEmployee = async (id, employeeData) => {
+  const {img, name, email, department, salary} = employeeData;
+  const q = "UPDATE employees SET img = ?, name = ?, email = ?, department = ?, salary = ? WHERE id = ?";
+  const [result] = await db.execute(q, [img, name, email, department, salary, id]);
   return result;
 };

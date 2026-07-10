@@ -73,8 +73,8 @@ export const employeeUpdateStatus = async (id, status) => {
 };
 
 export const updateDBEmployee = async (id, employeeData) => {
-  const {img, name, email, department, salary} = employeeData;
-  const q = "UPDATE employees SET img = ?, name = ?, email = ?, department = ?, salary = ? WHERE id = ?";
-  const [result] = await db.execute(q, [img, name, email, department, salary, id]);
+  const {img, name, email } = employeeData;
+  const q = "UPDATE employees SET img = ?, name = ?, email = ? WHERE id = ?";
+  const [result] = await db.execute(q, [img, name, email, id]);
   return result;
 };

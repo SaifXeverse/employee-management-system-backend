@@ -21,6 +21,11 @@ export const createEmployee = async (req, res) => {
     if (!gmailRegex.test(email)) {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json("Password must be at least 6 characters long.");
+    }
+
     const employee = await findEmployeeEmail(email);
 
     if (employee.length) {
@@ -145,6 +150,10 @@ export const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, department, password, status, salary, img } = req.body;
+
+    if (password && password.length < 6) {
+      return res.status(400).json("Password must be at least 6 characters long.");
+    }
 
     const employee = await findEmployeeEmail(email);
 

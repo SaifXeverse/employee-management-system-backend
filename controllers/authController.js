@@ -12,6 +12,10 @@ export const register = async (req, res) => {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
 
+    if (!password || password.length < 6) {
+      return res.status(400).json("Password must be at least 6 characters long.");
+    }
+
     const user = await findUserEmail(email);
 
     if (user.length) {
@@ -52,7 +56,7 @@ export const login = async (req, res) => {
         id: user[0].id,
       },
       "tokenSecret",
-      { expiresIn: "24h" },
+      { expiresIn: "1h" },
     );
 
     const { password: pass, ...others } = user[0];

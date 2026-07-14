@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { findUserEmail, createUser, getDBUser, updateDBUser } from "../models/authModel.js";
 import jwt from "jsonwebtoken";
+import { getIO } from "../socket.js";
 
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
@@ -99,13 +100,19 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
      const id = req.user.id;
-     const {img, name, email} = req.body;
+     const {email} = req.body;
 
      if (!gmailRegex.test(email)) {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
 
      const result = await updateDBUser(id, req.body)
+
+     getIO().emit("userProfileUpdate", {
+      id,
+      ...req.body
+     })
+
      res.status(200).json(result)
   } catch (error) {
     res.status(500).json(error + "error")

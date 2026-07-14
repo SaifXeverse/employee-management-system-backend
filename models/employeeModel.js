@@ -6,9 +6,10 @@ export const findEmployeeEmail = async (email) => {
   return row;
 };
 
-export const employeeAdd = async ({img, name, email, password, department, status, salary}) => {
+export const employeeAdd = async ({img, imgId, name, email, password, department, status, salary}) => {
   const values = [
     img || "https://cdn-icons-png.magnific.com/256/11136/11136505.png?semt=ais_white_label", 
+    imgId || null,
     name || null, 
     email || null, 
     password || null, 
@@ -17,7 +18,7 @@ export const employeeAdd = async ({img, name, email, password, department, statu
     salary || null
   ];
   const q =
-    "INSERT  INTO employees (img, name, email, password, department, status, salary) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    "INSERT  INTO employees (img, imgId, name, email, password, department, status, salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
   const [result] = await db.execute(q, values);
   return result;
 };
@@ -46,11 +47,12 @@ export const employeeDelete = async (id) => {
   return rows[0];
 };
 
-export const employeeUpdate = async (id, { name, email, department, password, status, salary, img }) => {
+export const employeeUpdate = async (id, { name, email, department, password, status, salary, img, imgId }) => {
   const q =
-    "UPDATE employees SET img = ?, name = ?, email = ?, password = ?, department = ?, status = ?,  salary = ? WHERE id = ?";
+    "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ?, password = ?, department = ?, status = ?,  salary = ? WHERE id = ?";
   const [result] = await db.execute(q, [
     img,
+    imgId,
     name,
     email,
     password,
@@ -73,8 +75,8 @@ export const employeeUpdateStatus = async (id, status) => {
 };
 
 export const updateDBEmployee = async (id, employeeData) => {
-  const {img, name, email } = employeeData;
-  const q = "UPDATE employees SET img = ?, name = ?, email = ? WHERE id = ?";
-  const [result] = await db.execute(q, [img, name, email, id]);
+  const {img, imgId, name, email } = employeeData;
+  const q = "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
+  const [result] = await db.execute(q, [img, imgId, name, email, id]);
   return result;
 };

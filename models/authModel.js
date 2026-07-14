@@ -19,8 +19,8 @@ export const getDBUser = async (id) => {
 };
 
 export const updateDBUser = async (id, userData) => {
-  const { img, name, email } = userData;
-  const q = "UPDATE users SET img = ?, name = ?, email = ? WHERE id = ?";
-  const [result] = await db.execute(q, [img, name, email, id]);
+  const { img, imgId, name, email } = userData;
+  const q = "UPDATE users SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
+  const [result] = await db.execute(q, [img, imgId, name, email, id]);
   return result;
 };

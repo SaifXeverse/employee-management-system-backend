@@ -11,19 +11,21 @@ import {
 } from "../models/employeeModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { getIO } from "../socket.js";
 
 const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
 export const createEmployee = async (req, res) => {
   try {
-
-    const { img, name, email, password, department, status, salary } = req.body;
+    const { img, imgId, name, email, password, department, status, salary } = req.body;
     if (!gmailRegex.test(email)) {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
 
     if (!password || password.length < 6) {
-      return res.status(400).json("Password must be at least 6 characters long.");
+      return res
+        .status(400)
+        .json("Password must be at least 6 characters long.");
     }
 
     const employee = await findEmployeeEmail(email);
@@ -36,6 +38,7 @@ export const createEmployee = async (req, res) => {
 
     await employeeAdd({
       img,
+      imgId,
       name,
       email,
       password: hashed,
@@ -43,7 +46,20 @@ export const createEmployee = async (req, res) => {
       status,
       salary,
     });
-    res.status(200).json({message : "Employee Created Successfully", employee: {name, email}});
+
+    getIO().emit("employeeCreated", {
+      img,
+      name,
+      email,
+      department,
+      status,
+      salary,
+    });
+
+    res.status(200).json({
+      message: "Employee Created Successfully",
+      employee: { name, email },
+    });
   } catch (error) {
     res.status(500).json(error + "error");
   }
@@ -60,7 +76,9 @@ export const employeeLogin = async (req, res) => {
     }
 
     if (employee[0].status === "inactive") {
-      return res.status(404).json("Employee is not active. Please contact the admin.");
+      return res
+        .status(404)
+        .json("Employee is not active. Please contact the admin.");
     }
 
     const check = await bcrypt.compare(password, employee[0].password);
@@ -140,6 +158,9 @@ export const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const employee = await employeeDelete(id);
+    getIO().emit("employeeDeleted", {
+      id,
+    });
     res.status(200).json("Delete Employee");
   } catch (error) {
     res.status(500).json(error + "error");
@@ -149,10 +170,12 @@ export const deleteEmployee = async (req, res) => {
 export const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, department, password, status, salary, img } = req.body;
+    const { name, email, department, password, status, salary, img, imgId } = req.body;
 
     if (password && password.length < 6) {
-      return res.status(400).json("Password must be at least 6 characters long.");
+      return res
+        .status(400)
+        .json("Password must be at least 6 characters long.");
     }
 
     const employee = await findEmployeeEmail(email);
@@ -173,6 +196,13 @@ export const updateEmployee = async (req, res) => {
       status,
       salary,
       img,
+      imgId
+    });
+
+    getIO().emit("employeeUpdated", {
+      id,
+      name,
+      email,
     });
 
     res.status(200).json("Employee updated successfully");
@@ -183,17 +213,23 @@ export const updateEmployee = async (req, res) => {
 
 export const updateEmployeeProfile = async (req, res) => {
   try {
-       const id = req.user.id;
-  
-       if (!gmailRegex.test(req.body.email)) {
-        return res.status(400).json("Only @gmail.com are allowed.");
-      }
-  
-       const result = await updateDBEmployee(id, req.body)
-       res.status(200).json(result)
-    } catch (error) {
-      res.status(500).json(error + "error")
+    const id = req.user.id;
+
+    if (!gmailRegex.test(req.body.email)) {
+      return res.status(400).json("Only @gmail.com are allowed.");
     }
+
+    const result = await updateDBEmployee(id, req.body);
+
+    getIO().emit("employeeProfileUpdated", {
+      id,
+      ...req.body,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json(error + "error");
+  }
 };
 
 export const updateEmployeeStatus = async (req, res) => {
@@ -201,6 +237,12 @@ export const updateEmployeeStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const result = await employeeUpdateStatus(id, status);
+
+    getIO().emit("employeeStatusChanged", {
+      id,
+      status,
+    })
+
     res.status(200).json("Employee status updated");
   } catch (error) {
     res.status(500).json(error + "error");

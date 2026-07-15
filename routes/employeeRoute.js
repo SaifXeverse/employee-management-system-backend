@@ -1,5 +1,5 @@
 import express from "express";
-import { createEmployee, deleteEmployee, employeeLogin, employeeLogout, getAllEmployees, getAllEmployeesInactive, getEmployee, getEmployeeProfile, updateEmployee, updateEmployeeProfile, updateEmployeeStatus } from "../controllers/employeeController.js";
+import { createEmployee, deleteEmployee, employeeLogin, employeeLogout, getAllEmployees, getAllEmployeesInactive, getEmployee, getEmployeeProfile, updateEmployee, updateEmployeeProfile, updateEmployeeStatus, uploadEmployeeResume } from "../controllers/employeeController.js";
 import { verifyTokenEmployee } from "../middleware/employeeMiddleware.js";
 
 
@@ -10,6 +10,8 @@ router.post("/logout", employeeLogout);
 
 router.get("/profile", verifyTokenEmployee, getEmployeeProfile);
 router.put("/profile", verifyTokenEmployee, updateEmployeeProfile);
+
+router.put("/upload", verifyTokenEmployee, uploadEmployeeResume);
 
 router.get("/status", getAllEmployeesInactive);
 router.put("/status/:id", updateEmployeeStatus);

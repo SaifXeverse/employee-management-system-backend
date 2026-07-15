@@ -5,6 +5,7 @@ import {
   employeeDelete,
   employeeUpdate,
   employeeUpdateStatus,
+  employeeUploadResume,
   findEmployeeEmail,
   singleEmployee,
   updateDBEmployee,
@@ -17,7 +18,8 @@ const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
 export const createEmployee = async (req, res) => {
   try {
-    const { img, imgId, name, email, password, department, status, salary } = req.body;
+    const { img, imgId, name, email, password, department, status, salary } =
+      req.body;
     if (!gmailRegex.test(email)) {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
@@ -61,7 +63,7 @@ export const createEmployee = async (req, res) => {
       employee: { name, email },
     });
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -122,7 +124,7 @@ export const getEmployee = async (req, res) => {
       employee: employee[0],
     });
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -132,7 +134,7 @@ export const getEmployeeProfile = async (req, res) => {
     const { password: pass, ...others } = employee[0];
     res.status(200).json(others);
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -141,7 +143,7 @@ export const getAllEmployees = async (req, res) => {
     const employees = await allEmployees();
     res.status(200).json(employees);
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -150,7 +152,7 @@ export const getAllEmployeesInactive = async (req, res) => {
     const employees = await allEmployeesInactive();
     res.status(200).json(employees);
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -163,14 +165,15 @@ export const deleteEmployee = async (req, res) => {
     });
     res.status(200).json("Delete Employee");
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
 export const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, department, password, status, salary, img, imgId } = req.body;
+    const { name, email, department, password, status, salary, img, imgId } =
+      req.body;
 
     if (password && password.length < 6) {
       return res
@@ -196,7 +199,7 @@ export const updateEmployee = async (req, res) => {
       status,
       salary,
       img,
-      imgId
+      imgId,
     });
 
     getIO().emit("employeeUpdated", {
@@ -207,7 +210,7 @@ export const updateEmployee = async (req, res) => {
 
     res.status(200).json("Employee updated successfully");
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -228,7 +231,7 @@ export const updateEmployeeProfile = async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
   }
 };
 
@@ -241,10 +244,23 @@ export const updateEmployeeStatus = async (req, res) => {
     getIO().emit("employeeStatusChanged", {
       id,
       status,
-    })
+    });
 
     res.status(200).json("Employee status updated");
   } catch (error) {
-    res.status(500).json(error + "error");
+    res.status(500).json(error + " error");
+  }
+};
+
+export const uploadEmployeeResume = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const { resume, resumeId } = req.body;
+    const result = await employeeUploadResume(id, resume, resumeId);
+
+    getIO().emit("employeeResumeUploaded", { id, resume, resumeId });
+    res.status(200).json("Employee resume uploaded");
+  } catch (error) {
+    res.status(500).json(error + " error");
   }
 };

@@ -6,16 +6,26 @@ export const findEmployeeEmail = async (email) => {
   return row;
 };
 
-export const employeeAdd = async ({img, imgId, name, email, password, department, status, salary}) => {
+export const employeeAdd = async ({
+  img,
+  imgId,
+  name,
+  email,
+  password,
+  department,
+  status,
+  salary,
+}) => {
   const values = [
-    img || "https://cdn-icons-png.magnific.com/256/11136/11136505.png?semt=ais_white_label", 
+    img ||
+      "https://cdn-icons-png.magnific.com/256/11136/11136505.png?semt=ais_white_label",
     imgId || null,
-    name || null, 
-    email || null, 
-    password || null, 
-    department || null, 
-    status || "inactive", 
-    salary || null
+    name || null,
+    email || null,
+    password || null,
+    department || null,
+    status || "inactive",
+    salary || null,
   ];
   const q =
     "INSERT  INTO employees (img, imgId, name, email, password, department, status, salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -47,7 +57,10 @@ export const employeeDelete = async (id) => {
   return rows[0];
 };
 
-export const employeeUpdate = async (id, { name, email, department, password, status, salary, img, imgId }) => {
+export const employeeUpdate = async (
+  id,
+  { name, email, department, password, status, salary, img, imgId },
+) => {
   const q =
     "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ?, password = ?, department = ?, status = ?,  salary = ? WHERE id = ?";
   const [result] = await db.execute(q, [
@@ -65,18 +78,21 @@ export const employeeUpdate = async (id, { name, email, department, password, st
 };
 
 export const employeeUpdateStatus = async (id, status) => {
-  const q =
-    "UPDATE employees SET status = ? WHERE id = ?";
-  const [result] = await db.execute(q, [
-    status,
-    id,
-  ]);
+  const q = "UPDATE employees SET status = ? WHERE id = ?";
+  const [result] = await db.execute(q, [status, id]);
+  return result;
+};
+
+export const employeeUploadResume = async (id, resume, resumeId) => {
+  const q = "UPDATE employees SET resume = ?, resumeId = ? WHERE id = ?";
+  const [result] = await db.execute(q, [resume, resumeId, id]);
   return result;
 };
 
 export const updateDBEmployee = async (id, employeeData) => {
-  const {img, imgId, name, email } = employeeData;
-  const q = "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
+  const { img, imgId, name, email } = employeeData;
+  const q =
+    "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
   const [result] = await db.execute(q, [img, imgId, name, email, id]);
   return result;
 };

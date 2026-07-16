@@ -57,7 +57,7 @@ export const login = async (req, res) => {
         id: user[0].id,
       },
       "tokenSecret",
-      { expiresIn: "1h" },
+      { expiresIn: "24h" },
     );
 
     const { password: pass, ...others } = user[0];

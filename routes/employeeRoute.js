@@ -18,6 +18,12 @@ router.delete("/resume/admin/delete/:id", deleteEmployeeResumeByAdmin);
 router.get("/status", getAllEmployeesInactive);
 router.put("/status/:id", updateEmployeeStatus);
 
+router.get("/verify", verifyTokenEmployee, (req,res)=>{
+  res.status(200).json({
+    success:true,
+    user:req.user
+  });
+});
 router.post("/", createEmployee);
 router.get("/", getAllEmployees);
 

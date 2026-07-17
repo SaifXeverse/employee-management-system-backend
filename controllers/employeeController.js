@@ -102,6 +102,9 @@ export const employeeLogin = async (req, res) => {
 
     res.cookie("AccessTokenEmployee", tokenEmployee, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(200).json(others);
   } catch (error) {
@@ -112,6 +115,9 @@ export const employeeLogin = async (req, res) => {
 export const employeeLogout = async (req, res) => {
   res.clearCookie("AccessTokenEmployee", {
     httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   return res.status(200).json("Employee is logout");
 };

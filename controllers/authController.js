@@ -1,5 +1,10 @@
 import bcrypt from "bcrypt";
-import { findUserEmail, createUser, getDBUser, updateDBUser } from "../models/authModel.js";
+import {
+  findUserEmail,
+  createUser,
+  getDBUser,
+  updateDBUser,
+} from "../models/authModel.js";
 import jwt from "jsonwebtoken";
 import { getIO } from "../socket.js";
 
@@ -14,7 +19,9 @@ export const register = async (req, res) => {
     }
 
     if (!password || password.length < 6) {
-      return res.status(400).json("Password must be at least 6 characters long.");
+      return res
+        .status(400)
+        .json("Password must be at least 6 characters long.");
     }
 
     const user = await findUserEmail(email);
@@ -64,6 +71,9 @@ export const login = async (req, res) => {
 
     res.cookie("AccessToken", token, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none", 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(200).json(others);
   } catch (error) {
@@ -74,6 +84,9 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("AccessToken", {
     httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(200).json("User is logout");
@@ -99,22 +112,22 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-     const id = req.user.id;
-     const {email} = req.body;
+    const id = req.user.id;
+    const { email } = req.body;
 
-     if (!gmailRegex.test(email)) {
+    if (!gmailRegex.test(email)) {
       return res.status(400).json("Only @gmail.com are allowed.");
     }
 
-     const result = await updateDBUser(id, req.body)
+    const result = await updateDBUser(id, req.body);
 
-     getIO().emit("userProfileUpdate", {
+    getIO().emit("userProfileUpdate", {
       id,
-      ...req.body
-     })
+      ...req.body,
+    });
 
-     res.status(200).json(result)
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json(error + "error")
+    res.status(500).json(error + "error");
   }
-}
+};

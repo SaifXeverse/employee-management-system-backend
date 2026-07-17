@@ -92,7 +92,13 @@ export const employeeUploadResume = async (id, resume, resumeId) => {
 export const updateDBEmployee = async (id, employeeData) => {
   const { img, imgId, name, email } = employeeData;
   const q =
-    "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
+  "UPDATE employees SET img = ?, imgId = ?, name = ?, email = ? WHERE id = ?";
   const [result] = await db.execute(q, [img, imgId, name, email, id]);
   return result;
+};
+
+export const employeeDeleteResume = async (id) => {
+  const q = "UPDATE employees SET resume = NULL, resumeId = NULL WHERE id = ?;";
+  const [rows] = await db.execute(q, [id]);
+  return rows[0];
 };

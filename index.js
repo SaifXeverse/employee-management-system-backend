@@ -27,6 +27,10 @@ app.use(
 app.use("/api/auth", authRoute);
 app.use("/api/employee", employeeRoute);
 
+app.get("/", (req,res) => {
+  res.json("Hello user")
+})
+
 server.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });

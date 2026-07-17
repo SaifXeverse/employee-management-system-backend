@@ -3,6 +3,7 @@ import {
   allEmployeesInactive,
   employeeAdd,
   employeeDelete,
+  employeeDeleteResume,
   employeeUpdate,
   employeeUpdateStatus,
   employeeUploadResume,
@@ -260,6 +261,30 @@ export const uploadEmployeeResume = async (req, res) => {
 
     getIO().emit("employeeResumeUploaded", { id, resume, resumeId });
     res.status(200).json("Employee resume uploaded");
+  } catch (error) {
+    res.status(500).json(error + " error");
+  }
+};
+
+export const deleteEmployeeResume = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const result = await employeeDeleteResume(id);
+
+    getIO().emit("employeeResumeDeleted", { id });
+    res.status(200).json("Employee resume deleted");
+  } catch (error) {
+    res.status(500).json(error + " error");
+  }
+};
+
+export const deleteEmployeeResumeByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await employeeDeleteResume(id);
+
+    getIO().emit("employeeResumeDeletedByAdmin", { id });
+    res.status(200).json("Employee resume deleted");
   } catch (error) {
     res.status(500).json(error + " error");
   }
